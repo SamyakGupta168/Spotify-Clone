@@ -89,11 +89,8 @@ body {
 }
 
 .card {
-  width: 220px;
-}
-
-.card {
   border: none;
+  width: 220px;
   padding: 10px;
   background-color: rgb(34, 33, 33);
   border-radius: 7px;
@@ -184,4 +181,9 @@ body {
 
 .songList ul {
   padding:12px 23px;
+}
+
+.play {
+  opacity:0;
+  transition:all 1s ease-in-out;
 }
