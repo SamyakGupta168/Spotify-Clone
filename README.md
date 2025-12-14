@@ -1,3 +1,3 @@
 # Spotify Clone
 
-A simple Spotify UI clone built using HTML, CSS, and JavaScript.
+This is a fully responsive Spotify clone built using HTML, CSS, and Javascript.
