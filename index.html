@@ -28,19 +28,6 @@
           <div class="songList">
             <ul>
               <!-- Here we will insert our songs -->
-              <li>
-                <img class="invert" src="music.svg" alt="music" />
-                <div class="info">
-                  <div>Song Name</div>
-                  <div>Song Artist</div>
-                </div>
-
-                <div class="playnow">
-                  <span>Play Now</span>
-                  <img class="invert" src="play.svg" alt="play" />
-                </div>
-              </li>
-              
             </ul>
           </div>
 
@@ -149,19 +136,20 @@
 
           <div class="playbar">
             <div class="seekbar">
-              <div class="circle">
+              <div class="circle"></div>
+            </div>
 
+            <div class="playContent">
+              <div class="songinfo"></div>
+
+              <div class="songbuttons">
+                <img id="previous" src="prevsong.svg" alt="previous" />
+                <img id="play" src="play.svg" alt="play" />
+                <img id="next" src="nextsong.svg" alt="next" />
               </div>
-            </div>
-            <div class="songinfo"></div>
 
-            <div class="songbuttons">
-              <img src="prevsong.svg" alt="previous" />
-              <img src="play.svg" alt="play" />
-              <img src="nextsong.svg" alt="next" />
+              <div class="songtime">00:00/00:00</div>
             </div>
-
-            <div class="songtime"></div>
           </div>
         </div>
       </div>

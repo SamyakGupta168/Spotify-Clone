@@ -1,4 +1,13 @@
-console.log("Let's write some javascript");
+let currentSong = new Audio();
+
+function formatTime(seconds) {
+  if (isNaN(seconds)) return "00:00";
+
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+
+  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+}
 
 async function getSongs() {
   let a = await fetch("http://127.0.0.1:5500/songs/");
@@ -20,10 +29,18 @@ async function getSongs() {
   return songs;
 }
 
+const playMusic = (url, songName) => {
+  // console.log(url, songName);
+  currentSong.src = url, songName;
+  currentSong.play();
+  play.src = "pause.svg";
+  document.querySelector(".songinfo").innerHTML = songName;
+}
+
 async function main() {
   // Getting the list of all the songs
   let urls = await getSongs();
-  console.log(urls);
+  // console.log(urls);
 
   let songUL = document
     .querySelector(".songList")
@@ -64,6 +81,40 @@ async function main() {
                 </div>
               </li>`;
   }
+
+  // Attach event listener to each song
+  Array.from(document.querySelector(".songList").getElementsByTagName("li")).forEach((e, index) => {
+    e.addEventListener("click", (evt) => {
+      console.log(e.querySelector(".info").firstElementChild.innerHTML);
+      playMusic(urls[index], e.querySelector(".info").firstElementChild.innerHTML);
+    });
+  });
+
 }
+
+// Attach event listener to play, next and previous buttons
+play.addEventListener("click", (e) => {
+  if(currentSong.paused){
+    currentSong.play();
+    play.src = "pause.svg";
+  } else {
+    currentSong.pause();
+    play.src = "play.svg";
+  }
+})
+
+// Listen for timeupdate event
+currentSong.addEventListener("timeupdate", (e) => {
+  console.log(currentSong.currentTime, currentSong.duration);
+  document.querySelector(".songtime").innerHTML = `${formatTime(currentSong.currentTime)}/${formatTime(currentSong.duration)}`;
+  
+  document.querySelector(".circle").style.left = `${(currentSong.currentTime/currentSong.duration)*100}%`;
+});
+
+// Adding an event listener to seekbar
+document.querySelector(".seekbar").addEventListener("click", (e) => {
+  console.log(e);
+});
+
 
 main();
