@@ -1,5 +1,6 @@
 let currentSong = new Audio();
-
+let urls = [];
+let songs = [];
 function formatTime(seconds) {
   if (isNaN(seconds)) return "00:00";
 
@@ -20,15 +21,14 @@ async function getSongs() {
   // console.log(div);
   let as = div.getElementsByTagName("a");
   // console.log(as);
-  let songs = [];
+  let songURL = [];
   for (let i = 0; i < as.length; i++) {
     if (as[i].href.endsWith(".mp3")) {
-      songs.push(as[i].href);
+      songURL.push(as[i].href);
     }
   }
 
-  // console.log(songs);
-  return songs;
+  return songURL;
 }
 
 const playMusic = (url, songName) => {
@@ -41,7 +41,7 @@ const playMusic = (url, songName) => {
 
 async function main() {
   // Getting the list of all the songs
-  let urls = await getSongs();
+  urls = await getSongs();
   console.log(urls);
 
   let songUL = document
@@ -49,7 +49,7 @@ async function main() {
     .getElementsByTagName("ul")[0];
 
   // This will extract name of the songs from their urls
-  const songs = urls.map((url) => {
+    songs = urls.map((url) => {
     // Step 1: Split the URL by '/' and take the last part (file name)
     // Example: "Aaj%20Ki%20Raat%20Stree%202%20128%20Kbps.mp3"
     const fileName = url.split("/").pop();
@@ -137,5 +137,44 @@ document.querySelector(".hamburger").addEventListener("click", (e) => {
 document.querySelector(".close").addEventListener("click", (e) => {
   document.querySelector(".left").style.left = "-120%";
 });
+
+// Adding event listener to previous
+previous.addEventListener("click", (e) => {
+  // console.log("Previous clicked");
+  let index = 1;
+  for(let i = 0; i < urls.length; i++) {
+    if(urls[i]==currentSong.src) {
+      index = i;
+      break;
+    }
+  }
+
+  if(index == 0){
+    playMusic(urls[urls.length - 1], songs[urls.length - 1]);
+  } else {
+    playMusic(urls[index-1], songs[index-1]);
+  }
+
+});
+
+// Adding event listener to next
+next.addEventListener("click", (e) => {
+  // console.log("Next clicked");
+  let index = -1;
+  for(let i = 0; i < urls.length; i++) {
+    if(urls[i]==currentSong.src) {
+      index = i;
+      break;
+    }
+  }
+
+  if(index == urls.length - 1){
+    playMusic(urls[0], songs[0]);
+  } else {
+    playMusic(urls[index+1], songs[index+1]);
+  }
+
+});
+
 
 main();
