@@ -6,7 +6,9 @@ function formatTime(seconds) {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
 
-  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  return `${mins.toString().padStart(2, "0")}:${secs
+    .toString()
+    .padStart(2, "0")}`;
 }
 
 async function getSongs() {
@@ -31,23 +33,23 @@ async function getSongs() {
 
 const playMusic = (url, songName) => {
   // console.log(url, songName);
-  currentSong.src = url, songName;
+  (currentSong.src = url), songName;
   currentSong.play();
   play.src = "pause.svg";
   document.querySelector(".songinfo").innerHTML = songName;
-}
+};
 
 async function main() {
   // Getting the list of all the songs
   let urls = await getSongs();
-  // console.log(urls);
+  console.log(urls);
 
   let songUL = document
     .querySelector(".songList")
     .getElementsByTagName("ul")[0];
 
+  // This will extract name of the songs from their urls
   const songs = urls.map((url) => {
-    // This will extract name of the songs from their urls
     // Step 1: Split the URL by '/' and take the last part (file name)
     // Example: "Aaj%20Ki%20Raat%20Stree%202%20128%20Kbps.mp3"
     const fileName = url.split("/").pop();
@@ -83,38 +85,57 @@ async function main() {
   }
 
   // Attach event listener to each song
-  Array.from(document.querySelector(".songList").getElementsByTagName("li")).forEach((e, index) => {
+  Array.from(
+    document.querySelector(".songList").getElementsByTagName("li")
+  ).forEach((e, index) => {
     e.addEventListener("click", (evt) => {
       console.log(e.querySelector(".info").firstElementChild.innerHTML);
-      playMusic(urls[index], e.querySelector(".info").firstElementChild.innerHTML);
+      playMusic(
+        urls[index],
+        e.querySelector(".info").firstElementChild.innerHTML
+      );
     });
   });
-
 }
 
 // Attach event listener to play, next and previous buttons
 play.addEventListener("click", (e) => {
-  if(currentSong.paused){
+  if (currentSong.paused) {
     currentSong.play();
     play.src = "pause.svg";
   } else {
     currentSong.pause();
     play.src = "play.svg";
   }
-})
+});
 
 // Listen for timeupdate event
 currentSong.addEventListener("timeupdate", (e) => {
   console.log(currentSong.currentTime, currentSong.duration);
-  document.querySelector(".songtime").innerHTML = `${formatTime(currentSong.currentTime)}/${formatTime(currentSong.duration)}`;
-  
-  document.querySelector(".circle").style.left = `${(currentSong.currentTime/currentSong.duration)*100}%`;
+  document.querySelector(".songtime").innerHTML = `${formatTime(
+    currentSong.currentTime
+  )}/${formatTime(currentSong.duration)}`;
+
+  document.querySelector(".circle").style.left = `${
+    (currentSong.currentTime / currentSong.duration) * 100
+  }%`;
 });
 
 // Adding an event listener to seekbar
 document.querySelector(".seekbar").addEventListener("click", (e) => {
-  console.log(e);
+  let fraction = e.offsetX / e.target.getBoundingClientRect().width;
+  document.querySelector(".circle").style.left = `${fraction * 100}%`;
+  currentSong.currentTime = currentSong.duration * fraction;
 });
 
+// Adding an event listener for hamburger
+document.querySelector(".hamburger").addEventListener("click", (e) => {
+  document.querySelector(".left").style.left = "0";
+});
+
+// Adding event listener to close icon of left
+document.querySelector(".close").addEventListener("click", (e) => {
+  document.querySelector(".left").style.left = "-120%";
+});
 
 main();
