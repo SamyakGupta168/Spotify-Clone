@@ -14,34 +14,21 @@ function formatTime(seconds) {
     .padStart(2, "0")}`;
 }
 
-// In getSongs function just give the folder name from which you want to fetch the songs
+// getSongs function will extract all the songs from the given folder and will display their songs in the songlist
 async function getSongs(folder) {
+  urls.length = 0;
+  songs.length = 0;
   currFolder = folder;
   let a = await fetch(`http://127.0.0.1:5500/songs/${currFolder}/`);
   let response = await a.text();
   let div = document.createElement("div");
   div.innerHTML = response;
   let as = div.getElementsByTagName("a");
-  let songURL = [];
   for (let i = 0; i < as.length; i++) {
     if (as[i].href.endsWith(".mp3")) {
-      songURL.push(as[i].href);
+      urls.push(as[i].href);
     }
   }
-
-  return songURL;
-}
-
-const playMusic = (url, songName) => {
-  (currentSong.src = url), songName;
-  currentSong.play();
-  play.src = "pause.svg";
-  document.querySelector(".songinfo").innerHTML = songName;
-};
-
-async function main() {
-  // Getting the list of all the songs
-  urls = await getSongs("ncs");
 
   let songUL = document
     .querySelector(".songList")
@@ -49,28 +36,20 @@ async function main() {
 
   // This will extract name of the songs from their urls
   songs = urls.map((url) => {
-    // Step 1: Split the URL by '/' and take the last part (file name)
-    // Example: "Aaj%20Ki%20Raat%20Stree%202%20128%20Kbps.mp3"
     const fileName = url.split("/").pop();
-
-    // Step 2: Decode URL-encoded characters
-    // %20 → space, %26 → &, etc.
     const decodedName = decodeURIComponent(fileName);
-
-    // Step 3: Remove the ".mp3" extension from the file name
     const songName = decodedName.replace(".mp3", "");
-
-    // Step 4: Return the clean song name
     return songName;
   });
 
+  songUL.innerHTML = ""; // Removing previous songs present in the song list
   // This will show all the songs in the playlist
   for (let song of songs) {
     songUL.innerHTML =
       songUL.innerHTML +
       `
               <li>
-                <img class="invert" src="music.svg" alt="music" />
+                <img class="invert" src="assets/music.svg" alt="music" />
                 <div class="info">
                   <div>${song}</div>
                   <div>Samyak</div>
@@ -78,7 +57,7 @@ async function main() {
 
                 <div class="playnow">
                   <span>Play Now</span>
-                  <img class="invert" src="play.svg" alt="play" />
+                  <img class="invert" src="assets/play.svg" alt="play" />
                 </div>
               </li>`;
   }
@@ -96,14 +75,79 @@ async function main() {
   });
 }
 
+const playMusic = (url, songName) => {
+  (currentSong.src = url), songName;
+  currentSong.play();
+  play.src = "assets/pause.svg";
+  document.querySelector(".songinfo").innerHTML = songName;
+};
+
+// This function will display all the albums on the page
+async function displayAlbums() {
+  let a = await fetch("http://127.0.0.1:5500/songs/");
+  let response = await a.text();
+  let div = document.createElement("div");
+  div.innerHTML = response;
+  let anchors = div.getElementsByTagName("a");
+  let cardContainer = document.querySelector(".cardContainer");
+  for (let e of anchors) {
+    if (e.href.includes("/songs/")) {
+      let folder = e.href.split("/").pop();
+      // Getting the metadata of the folder
+      let a = await fetch(`http://127.0.0.1:5500/songs/${folder}/info.json`);
+      let response = await a.json();
+      cardContainer.innerHTML =
+        cardContainer.innerHTML +
+        `<div data-folder="${folder}" class="card">
+              <div class="play">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="48"
+                  height="48"
+                  fill="none"
+                >
+                  <!-- Green Circle Background -->
+                  <circle cx="12" cy="12" r="12" fill="#1ed760" />
+
+                  <!-- Centered Black Play Button -->
+                  <polygon points="10,8 10,16 16,12" fill="black" />
+                </svg>
+              </div>
+              <img
+                src="/songs/${folder}/cover.jpg"
+                alt="image"
+              />
+              <h2>${response.title}</h2>
+              <p>${response.discription}</p>
+            </div>`;
+    }
+  }
+
+  // Load the playlist whenever card is clicked
+  Array.from(document.querySelectorAll(".card")).forEach((card) => {
+    card.addEventListener("click", async (e) => {
+      await getSongs(`${card.dataset.folder}`);
+    });
+  });
+}
+
+async function main() {
+  // Getting the list of all the songs
+  await getSongs(); // By default ncs folder songs will be displayed
+
+  // Displaying all the albums on the page
+  await displayAlbums();
+}
+
 // Attach event listener to play, next and previous buttons
 play.addEventListener("click", (e) => {
   if (currentSong.paused) {
     currentSong.play();
-    play.src = "pause.svg";
+    play.src = "assets/pause.svg";
   } else {
     currentSong.pause();
-    play.src = "play.svg";
+    play.src = "assets/play.svg";
   }
 });
 
@@ -173,71 +217,20 @@ next.addEventListener("click", (e) => {
 
 // Adding event listener to volume
 document.querySelector(".range input").addEventListener("change", (e) => {
-  console.log("Setting volume to " + e.target.value);
   currentSong.volume = parseInt(e.target.value) / 100;
 });
 
-// Load the playlist whenever card is clicked
-Array.from(document.querySelectorAll(".card")).forEach((card) => {
-  card.addEventListener("click", async (e) => {
-    console.log(card.dataset);
-    urls = await getSongs(`${card.dataset.folder}`);
-    // console.log(urls);
-
-    let songUL = document
-      .querySelector(".songList")
-      .getElementsByTagName("ul")[0];
-
-    // This will extract name of the songs from their urls
-    songs = urls.map((url) => {
-      // Step 1: Split the URL by '/' and take the last part (file name)
-      // Example: "Aaj%20Ki%20Raat%20Stree%202%20128%20Kbps.mp3"
-      const fileName = url.split("/").pop();
-
-      // Step 2: Decode URL-encoded characters
-      // %20 → space, %26 → &, etc.
-      const decodedName = decodeURIComponent(fileName);
-
-      // Step 3: Remove the ".mp3" extension from the file name
-      const songName = decodedName.replace(".mp3", "");
-
-      // Step 4: Return the clean song name
-      return songName;
-    });
-
-    songUL.innerHTML = ""; 
-    // This will show all the songs in the playlist
-    for (let song of songs) {
-      songUL.innerHTML =
-        songUL.innerHTML +
-        `
-              <li>
-                <img class="invert" src="music.svg" alt="music" />
-                <div class="info">
-                  <div>${song}</div>
-                  <div>Samyak</div>
-                </div>
-
-                <div class="playnow">
-                  <span>Play Now</span>
-                  <img class="invert" src="play.svg" alt="play" />
-                </div>
-              </li>`;
-    }
-
-    // Attach event listener to each song
-    Array.from(
-      document.querySelector(".songList").getElementsByTagName("li")
-    ).forEach((e, index) => {
-      e.addEventListener("click", (evt) => {
-        playMusic(
-          urls[index],
-          e.querySelector(".info").firstElementChild.innerHTML
-        );
-      });
-    });
-  });
-
-});
+// Adding an event listener to mute the track
+document.querySelector(".volume img").addEventListener("click" , (e) => {
+  if(e.target.src.includes("assets/volume.svg")) {
+    e.target.src = e.target.src.replace("assets/volume.svg", "assets/mute.svg");
+    currentSong.volume = 0;
+    document.querySelector(".range input").value = 0;
+  } else  {
+    e.target.src = e.target.src.replace("assets/mute.svg", "assets/volume.svg");
+    currentSong.volume = 0.10;
+    document.querySelector(".range input").value = 10;
+  }
+})
 
 main();
