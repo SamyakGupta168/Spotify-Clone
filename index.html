@@ -115,7 +115,7 @@
         <div class="spotifyPlaylist">
           <h1>Spotify Playlists</h1>
           <div class="cardContainer">
-            <div class="card">
+            <div data-folder="ncs" class="card">
               <div class="play">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +139,7 @@
               <p>Hits to boost your mood and fill you with happiness!</p>
             </div>
 
-            <div class="card">
+            <div data-folder="cs" class="card">
               <div class="play">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -162,121 +162,7 @@
               <h2>Happy Hits!</h2>
               <p>Hits to boost your mood and fill you with happiness!</p>
             </div>
-            <div class="card">
-              <div class="play">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="48"
-                  height="48"
-                  fill="none"
-                >
-                  <!-- Green Circle Background -->
-                  <circle cx="12" cy="12" r="12" fill="#1ed760" />
-
-                  <!-- Centered Black Play Button -->
-                  <polygon points="10,8 10,16 16,12" fill="black" />
-                </svg>
-              </div>
-              <img
-                src="https://i.scdn.co/image/ab67616d00001e02054426e1c8140a2b6ff51948"
-                alt="image"
-              />
-              <h2>Happy Hits!</h2>
-              <p>Hits to boost your mood and fill you with happiness!</p>
-            </div>
-            <div class="card">
-              <div class="play">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="48"
-                  height="48"
-                  fill="none"
-                >
-                  <!-- Green Circle Background -->
-                  <circle cx="12" cy="12" r="12" fill="#1ed760" />
-
-                  <!-- Centered Black Play Button -->
-                  <polygon points="10,8 10,16 16,12" fill="black" />
-                </svg>
-              </div>
-              <img
-                src="https://i.scdn.co/image/ab67616d00001e02054426e1c8140a2b6ff51948"
-                alt="image"
-              />
-              <h2>Happy Hits!</h2>
-              <p>Hits to boost your mood and fill you with happiness!</p>
-            </div>
-            <div class="card">
-              <div class="play">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="48"
-                  height="48"
-                  fill="none"
-                >
-                  <!-- Green Circle Background -->
-                  <circle cx="12" cy="12" r="12" fill="#1ed760" />
-
-                  <!-- Centered Black Play Button -->
-                  <polygon points="10,8 10,16 16,12" fill="black" />
-                </svg>
-              </div>
-              <img
-                src="https://i.scdn.co/image/ab67616d00001e02054426e1c8140a2b6ff51948"
-                alt="image"
-              />
-              <h2>Happy Hits!</h2>
-              <p>Hits to boost your mood and fill you with happiness!</p>
-            </div>
-            <div class="card">
-              <div class="play">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="48"
-                  height="48"
-                  fill="none"
-                >
-                  <!-- Green Circle Background -->
-                  <circle cx="12" cy="12" r="12" fill="#1ed760" />
-
-                  <!-- Centered Black Play Button -->
-                  <polygon points="10,8 10,16 16,12" fill="black" />
-                </svg>
-              </div>
-              <img
-                src="https://i.scdn.co/image/ab67616d00001e02054426e1c8140a2b6ff51948"
-                alt="image"
-              />
-              <h2>Happy Hits!</h2>
-              <p>Hits to boost your mood and fill you with happiness!</p>
-            </div>
-            <div class="card">
-              <div class="play">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="48"
-                  height="48"
-                  fill="none"
-                >
-                  <!-- Green Circle Background -->
-                  <circle cx="12" cy="12" r="12" fill="#1ed760" />
-
-                  <!-- Centered Black Play Button -->
-                  <polygon points="10,8 10,16 16,12" fill="black" />
-                </svg>
-              </div>
-              <img
-                src="https://i.scdn.co/image/ab67616d00001e02054426e1c8140a2b6ff51948"
-                alt="image"
-              />
-              <h2>Happy Hits!</h2>
-              <p>Hits to boost your mood and fill you with happiness!</p>
-            </div>
+      
           </div>
 
           <div class="playbar">
@@ -293,7 +179,15 @@
                 <img id="next" src="nextsong.svg" alt="next" />
               </div>
 
-              <div class="songtime">00:00/00:00</div>
+              <div class="timevol">
+                <div class="songtime">00:00/00:00</div>
+                <div class="volume">
+                  <img src="volume.svg" alt="volume">
+                  <div class="range">
+                    <input type="range" name="volume">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

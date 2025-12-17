@@ -1,6 +1,8 @@
 let currentSong = new Audio();
 let urls = [];
 let songs = [];
+let currFolder;
+
 function formatTime(seconds) {
   if (isNaN(seconds)) return "00:00";
 
@@ -12,15 +14,14 @@ function formatTime(seconds) {
     .padStart(2, "0")}`;
 }
 
-async function getSongs() {
-  let a = await fetch("http://127.0.0.1:5500/songs/");
+// In getSongs function just give the folder name from which you want to fetch the songs
+async function getSongs(folder) {
+  currFolder = folder;
+  let a = await fetch(`http://127.0.0.1:5500/songs/${currFolder}/`);
   let response = await a.text();
-  // console.log(response);
   let div = document.createElement("div");
   div.innerHTML = response;
-  // console.log(div);
   let as = div.getElementsByTagName("a");
-  // console.log(as);
   let songURL = [];
   for (let i = 0; i < as.length; i++) {
     if (as[i].href.endsWith(".mp3")) {
@@ -32,7 +33,6 @@ async function getSongs() {
 }
 
 const playMusic = (url, songName) => {
-  // console.log(url, songName);
   (currentSong.src = url), songName;
   currentSong.play();
   play.src = "pause.svg";
@@ -41,15 +41,14 @@ const playMusic = (url, songName) => {
 
 async function main() {
   // Getting the list of all the songs
-  urls = await getSongs();
-  console.log(urls);
+  urls = await getSongs("ncs");
 
   let songUL = document
     .querySelector(".songList")
     .getElementsByTagName("ul")[0];
 
   // This will extract name of the songs from their urls
-    songs = urls.map((url) => {
+  songs = urls.map((url) => {
     // Step 1: Split the URL by '/' and take the last part (file name)
     // Example: "Aaj%20Ki%20Raat%20Stree%202%20128%20Kbps.mp3"
     const fileName = url.split("/").pop();
@@ -89,7 +88,6 @@ async function main() {
     document.querySelector(".songList").getElementsByTagName("li")
   ).forEach((e, index) => {
     e.addEventListener("click", (evt) => {
-      console.log(e.querySelector(".info").firstElementChild.innerHTML);
       playMusic(
         urls[index],
         e.querySelector(".info").firstElementChild.innerHTML
@@ -111,7 +109,6 @@ play.addEventListener("click", (e) => {
 
 // Listen for timeupdate event
 currentSong.addEventListener("timeupdate", (e) => {
-  console.log(currentSong.currentTime, currentSong.duration);
   document.querySelector(".songtime").innerHTML = `${formatTime(
     currentSong.currentTime
   )}/${formatTime(currentSong.duration)}`;
@@ -140,41 +137,107 @@ document.querySelector(".close").addEventListener("click", (e) => {
 
 // Adding event listener to previous
 previous.addEventListener("click", (e) => {
-  // console.log("Previous clicked");
+  console.log("Previous clicked");
   let index = 1;
-  for(let i = 0; i < urls.length; i++) {
-    if(urls[i]==currentSong.src) {
+  for (let i = 0; i < urls.length; i++) {
+    if (urls[i] == currentSong.src) {
       index = i;
       break;
     }
   }
 
-  if(index == 0){
+  if (index == 0) {
     playMusic(urls[urls.length - 1], songs[urls.length - 1]);
   } else {
-    playMusic(urls[index-1], songs[index-1]);
+    playMusic(urls[index - 1], songs[index - 1]);
   }
-
 });
 
 // Adding event listener to next
 next.addEventListener("click", (e) => {
-  // console.log("Next clicked");
+  console.log("Next clicked");
   let index = -1;
-  for(let i = 0; i < urls.length; i++) {
-    if(urls[i]==currentSong.src) {
+  for (let i = 0; i < urls.length; i++) {
+    if (urls[i] == currentSong.src) {
       index = i;
       break;
     }
   }
 
-  if(index == urls.length - 1){
+  if (index == urls.length - 1) {
     playMusic(urls[0], songs[0]);
   } else {
-    playMusic(urls[index+1], songs[index+1]);
+    playMusic(urls[index + 1], songs[index + 1]);
   }
-
 });
 
+// Adding event listener to volume
+document.querySelector(".range input").addEventListener("change", (e) => {
+  console.log("Setting volume to " + e.target.value);
+  currentSong.volume = parseInt(e.target.value) / 100;
+});
+
+// Load the playlist whenever card is clicked
+Array.from(document.querySelectorAll(".card")).forEach((card) => {
+  card.addEventListener("click", async (e) => {
+    console.log(card.dataset);
+    urls = await getSongs(`${card.dataset.folder}`);
+    // console.log(urls);
+
+    let songUL = document
+      .querySelector(".songList")
+      .getElementsByTagName("ul")[0];
+
+    // This will extract name of the songs from their urls
+    songs = urls.map((url) => {
+      // Step 1: Split the URL by '/' and take the last part (file name)
+      // Example: "Aaj%20Ki%20Raat%20Stree%202%20128%20Kbps.mp3"
+      const fileName = url.split("/").pop();
+
+      // Step 2: Decode URL-encoded characters
+      // %20 → space, %26 → &, etc.
+      const decodedName = decodeURIComponent(fileName);
+
+      // Step 3: Remove the ".mp3" extension from the file name
+      const songName = decodedName.replace(".mp3", "");
+
+      // Step 4: Return the clean song name
+      return songName;
+    });
+
+    songUL.innerHTML = ""; 
+    // This will show all the songs in the playlist
+    for (let song of songs) {
+      songUL.innerHTML =
+        songUL.innerHTML +
+        `
+              <li>
+                <img class="invert" src="music.svg" alt="music" />
+                <div class="info">
+                  <div>${song}</div>
+                  <div>Samyak</div>
+                </div>
+
+                <div class="playnow">
+                  <span>Play Now</span>
+                  <img class="invert" src="play.svg" alt="play" />
+                </div>
+              </li>`;
+    }
+
+    // Attach event listener to each song
+    Array.from(
+      document.querySelector(".songList").getElementsByTagName("li")
+    ).forEach((e, index) => {
+      e.addEventListener("click", (evt) => {
+        playMusic(
+          urls[index],
+          e.querySelector(".info").firstElementChild.innerHTML
+        );
+      });
+    });
+  });
+
+});
 
 main();
